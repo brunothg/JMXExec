@@ -74,6 +74,7 @@ public class Application {
 
 	if (mbean == null || method == null || port == null || ip == null) {
 	    System.err.println("Missing options.");
+	    cmd(new String[] { OPTION_HELP });
 	    return;
 	}
 	try {
