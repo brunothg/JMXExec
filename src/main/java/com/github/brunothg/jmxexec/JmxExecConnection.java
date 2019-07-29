@@ -74,14 +74,4 @@ public class JmxExecConnection {
 	this.method = method;
     }
 
-    public String toOptions() {
-	return "-" + Application.OPTION_IP + "\n" + getIp() + "\n-" + Application.OPTION_PORT + "\n" + getPort() + "\n-"
-		+ Application.OPTION_MBEAN + "\n" + getMbean() + "\n-" + Application.OPTION_METHOD + "\n" + getMethod();
-    }
-
-    @Override
-    public String toString() {
-	return toOptions();
-    }
-
 }

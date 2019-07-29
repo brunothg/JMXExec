@@ -1,14 +1,17 @@
 package com.github.brunothg.jmxexec;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -24,11 +27,12 @@ import org.apache.commons.cli.ParseException;
  *
  */
 public class Application {
-    public static final String OPTION_MBEAN = "mb";
-    public static final String OPTION_METHOD = "m";
-    public static final String OPTION_PORT = "p";
-    public static final String OPTION_IP = "i";
-    public static final String OPTION_FILE = "f";
+    protected static final String OPTION_MBEAN = "mb";
+    protected static final String OPTION_METHOD = "m";
+    protected static final String OPTION_PORT = "p";
+    protected static final String OPTION_IP = "i";
+    protected static final String OPTION_FILE = "f";
+    protected static final String OPTION_HELP = "h";
 
     public static void main(String[] args) {
 	try {
@@ -38,9 +42,23 @@ public class Application {
 	}
     }
 
-    private static void cmd(String[] args) throws ParseException, IOException {
+    /**
+     * Run jmxexec with the given arguments
+     * 
+     * @param args
+     * @throws ParseException
+     * @throws IOException
+     */
+    public static void cmd(String[] args) throws ParseException, IOException {
 	final CommandLineParser parser = new DefaultParser();
-	final CommandLine cmd = parser.parse(cmdOptions(), args);
+	final Options cmdOptions = cmdOptions();
+	final CommandLine cmd = parser.parse(cmdOptions, args);
+
+	if (cmd.hasOption(OPTION_HELP)) {
+	    final HelpFormatter formatter = new HelpFormatter();
+	    formatter.printHelp("jmxexec", cmdOptions);
+	    return;
+	}
 
 	final String mbean = cmd.getOptionValue(OPTION_MBEAN);
 	final String method = cmd.getOptionValue(OPTION_METHOD);
@@ -71,6 +89,22 @@ public class Application {
 	}
     }
 
+    /**
+     * Writes a jmx file for usage with -f option
+     * 
+     * @param con
+     * @param path
+     * @throws IOException
+     */
+    public static void writeJmxExecFile(JmxExecConnection con, Path path) throws IOException {
+
+	final String jmx = String.format("-i %s -p %s -mb %s -m %s".replaceAll(" ", "%n"), "" + con.getIp(),
+		"" + con.getPort(), "" + con.getMbean(), "" + con.getMethod());
+	final File file = path.toFile();
+	file.deleteOnExit();
+	Files.write(file.toPath(), jmx.getBytes(StandardCharsets.UTF_8));
+    }
+
     private static Integer toInt(String value) {
 	if (value == null) {
 	    return null;
@@ -80,6 +114,8 @@ public class Application {
 
     private static Options cmdOptions() {
 	final Options options = new Options();
+	options.addOption(OPTION_HELP, "help", false, "Show help");
+
 	options.addOption(OPTION_MBEAN, "mbean", true,
 		"MBean-Name e.g. org.springframework.boot:type=Admin,name=SpringApplication");
 
