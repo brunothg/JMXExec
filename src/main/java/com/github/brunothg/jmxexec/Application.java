@@ -55,8 +55,7 @@ public class Application {
 	final CommandLine cmd = parser.parse(cmdOptions, args);
 
 	if (cmd.hasOption(OPTION_HELP)) {
-	    final HelpFormatter formatter = new HelpFormatter();
-	    formatter.printHelp("jmxexec", cmdOptions);
+	    printHelp(cmdOptions);
 	    return;
 	}
 
@@ -74,7 +73,7 @@ public class Application {
 
 	if (mbean == null || method == null || port == null || ip == null) {
 	    System.err.println("Missing options.");
-	    cmd(new String[] { "-" + OPTION_HELP });
+	    printHelp(cmdOptions);
 	    return;
 	}
 	try {
@@ -88,6 +87,11 @@ public class Application {
 	} catch (final Exception e) {
 	    e.printStackTrace();
 	}
+    }
+
+    private static void printHelp(final Options cmdOptions) {
+	final HelpFormatter formatter = new HelpFormatter();
+	formatter.printHelp("jmxexec", cmdOptions);
     }
 
     /**
