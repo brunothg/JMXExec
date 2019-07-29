@@ -28,6 +28,8 @@ public class JmxExec {
 	final MBeanServerConnection connection = jmxConnector.getMBeanServerConnection();
 	final ObjectName mbean = new ObjectName(con.getMbean());
 
+	System.out.println(
+		"Exec " + con.getMethod() + " on " + con.getMbean() + " at " + con.getIp() + ":" + con.getPort());
 	connection.invoke(mbean, con.getMethod(), null, null);
     }
 }
